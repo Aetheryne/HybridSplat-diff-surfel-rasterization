@@ -12,7 +12,12 @@
 from setuptools import setup
 from torch.utils.cpp_extension import CUDAExtension, BuildExtension
 import os
-os.path.dirname(os.path.abspath(__file__))
+glm_include = os.path.join(os.path.dirname(os.path.abspath(__file__)), "third_party", "glm")
+if not os.path.isfile(os.path.join(glm_include, "glm", "glm.hpp")):
+    raise RuntimeError(
+        "GLM headers are missing. Run git submodule update --init --recursive "
+        "from the HybridSplat repository before installing this rasterizer."
+    )
 
 setup(
     name="diff_surfel_rasterization_wet_ch05",
@@ -27,7 +32,7 @@ setup(
             "cuda_rasterizer/backward.cu",
             "rasterize_points.cu",
             "ext.cpp"],
-            extra_compile_args={"nvcc": ["-I" + os.path.join(os.path.dirname(os.path.abspath(__file__)), "../third_party/glm/")]})
+            extra_compile_args={"nvcc": ["-I" + glm_include]})
         ],
     cmdclass={
         'build_ext': BuildExtension
